@@ -3,14 +3,19 @@ package main
 import(
     "github.com/gocolly/colly"
     "fmt"
+    "regexp"
 )
 
 func main() {
     c := colly.NewCollector()
+    var acronLink = regexp.MustCompile(`detalhes.*papel=[A-Z]{4}[0-9]{1,2}$`)
 
     // Find and visit all links
     c.OnHTML("a", func(e *colly.HTMLElement) {
-        e.Request.Visit(e.Attr("href"))
+
+        if(acronLink.MatchString(e.Attr("href"))){
+            e.Request.Visit(e.Attr("href"))
+        }
     })
 
     c.OnRequest(func(r *colly.Request) {
