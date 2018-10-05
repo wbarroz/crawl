@@ -4,7 +4,16 @@ import(
     "github.com/gocolly/colly"
     "fmt"
     "regexp"
+    "strings"
+    "strconv"
 )
+
+type stock struct{
+    papel string
+    empresa string
+    varDia float64
+    valor float64
+}
 
 func main() {
     c := colly.NewCollector(
@@ -15,6 +24,8 @@ func main() {
         mapOfMine=make(map[int]string)
         counter=0
         second=false
+        isStockVal=true
+        workStock stock
     )
 
     // Find and visit all links, "first sweep":
@@ -23,6 +34,7 @@ func main() {
         if(acronLink.MatchString(e.Attr("href"))){
             counter=0
             second=false
+            isStockVal=true
             e.Request.Visit(e.Attr("href"))
             //fmt.Printf("counter = %d\n",counter);
         }
@@ -37,9 +49,10 @@ func main() {
         case "?Empresa":
             mapOfMine[counter]="empresa"
         case "Dia":
-            mapOfMine[counter]="dia"
-        case "?Valor de mercado":
+            mapOfMine[counter]="varDia"
+        /*case "?Valor de mercado":
             mapOfMine[counter]="valor"
+            */
         }
         //fmt.Printf("counter = %d\n",counter);
         counter+=1
@@ -54,9 +67,29 @@ func main() {
         key,ok:=mapOfMine[counter]
         if ok{
             fmt.Printf("%s => %s\n",key,e.Text);
+            //for key,value:=range(mapOfMine){
+                //switch value{
+                switch key{
+                case "papel":
+                    workStock.papel=e.Text
+                case "empresa":
+                    workStock.empresa=e.Text
+                case "varDia":
+                    workStock.varDia,_=strconv.ParseFloat(strings.Replace(strings.Replace(e.Text,",",".",1),"%","",1),64)
+                }
+            //}
         }
         //fmt.Printf("counter = %d\n",counter);
         counter+=1
+    })
+
+    c.OnHTML("tr td:nth-of-type(4)", func(e *colly.HTMLElement) {
+        if isStockVal{
+            isStockVal=false
+            workStock.valor,_=strconv.ParseFloat(strings.Replace(e.Text,",",".",1),64)
+            fmt.Printf("Valor de mercado(cotação) => %s\n",e.Text)
+            fmt.Println(workStock);
+        }
     })
 
     c.OnRequest(func(r *colly.Request) {
