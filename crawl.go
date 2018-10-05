@@ -67,8 +67,8 @@ func main() {
         /*if limit==0{
             return
         }else{
-            limit-=1*/
-        }
+            limit-=1
+        }*/
         if(acronLink.MatchString(e.Attr("href"))){
             counter=0
             second=false
