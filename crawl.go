@@ -15,9 +15,25 @@ type stock struct{
     valor float64
 }
 
+func(this stock)is_bigger_than(that stock)bool{
+    return this.valor>that.valor
+}
+
+func insort(input stock,array[]stock)[]stock{
+    if(len(array)!=0){
+        for i,item:=range(array){
+            if input.is_bigger_than(item){
+                return append(append(array[0:i],input),array[i:]...)
+            }
+        }
+    }
+    return append(array,input)
+}
+
 func main() {
     c := colly.NewCollector(
         colly.AllowedDomains("www.fundamentus.com.br",),
+        colly.MaxDepth(2),
     )
     var (
         acronLink=regexp.MustCompile(`detalhes.*papel=[A-Z]{4}[0-9]{1,2}$`)
@@ -26,6 +42,7 @@ func main() {
         second=false
         isStockVal=true
         workStock stock
+        sortedArray[]stock
     )
 
     // Find and visit all links, "first sweep":
@@ -89,6 +106,11 @@ func main() {
             workStock.valor,_=strconv.ParseFloat(strings.Replace(e.Text,",",".",1),64)
             fmt.Printf("Valor de mercado(cotação) => %s\n",e.Text)
             fmt.Println(workStock);
+            sortedArray=insort(workStock,sortedArray)
+            if(len(sortedArray)>10){
+                sortedArray=sortedArray[0:10]
+            }
+            fmt.Println(sortedArray);
         }
     })
 
