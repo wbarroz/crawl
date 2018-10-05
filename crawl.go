@@ -23,7 +23,20 @@ func insort(input stock,array[]stock)[]stock{
     if(len(array)!=0){
         for i,item:=range(array){
             if input.is_bigger_than(item){
-                return append(append(array[0:i],input),array[i:]...)
+                tail:=array[i:]
+                new_tail:=make([]stock,len(tail))
+                for j,source:=range(tail){
+                    new_tail[j]=source
+                }
+                fmt.Println("tail",new_tail)
+                head:=append(array[0:i],input)
+                new_head:=make([]stock,len(head))
+                for j,source:=range(head){
+                    new_head[j]=source
+                }
+                fmt.Println("head",new_head)
+                fmt.Println("comb",append(new_head,new_tail...))
+                return append(new_head,new_tail...)
             }
         }
     }
@@ -42,6 +55,7 @@ func main() {
         second=false
         isStockVal=true
         workStock stock
+        //sortedArray[10]stock
         sortedArray[]stock
     )
 
