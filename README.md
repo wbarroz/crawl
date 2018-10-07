@@ -26,3 +26,14 @@ and peep into the server.
 
 Running the crawl code should populate the stocks table in redventures database with the top ten stock positions.
 
+The container
+Yes, the app is now containeirized!
+In this folder just fire it up:
+
+docker build -t crawl .
+
+to build the container, and
+
+docker run --net=host --name=crawler -d crawl:latest
+
+to run it, it's a one-off run. You could check the db for the updated stocks table.
